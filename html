@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thimble Sample</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  
+  
+  <body>
+
+
+    <p id="health"></p>
+    <p id="mana"></p>
+    <p id="gold"></p>
+    <p id="xp"></p>
+    <p id="level"></p>
+    <h2 id="event"></h2>
+    <p id="enemyhealth"></p>
+    <button onclick= "attack()">Swing Sword</button>
+    <button onclick = "addmana()">Mana Potion</button>
+    <button onclick = "addhealth()">Health Potion</button>
+    <br>
+    <h3><br>spellbook</h3>
+    <button onclick = "fireball()">Fireball</button>
+    <p>Fireball (level 1 spell): does 10*(lvl) damage. (15 mana)</p>
+    <button onclick = "pickpocket()">Pickpocket</button>
+    <p>Pickpocket (level 3 spell): Do (lvl) damage. If that kills the enemy, gain double gold. (10 mana)</p>
+    <button onclick = "lifetap()">Life Tap</button>
+    <p>Life Tap (level 5 spell): Do 5*(lvl) damage, and restore as much health (20 mana)</p>
+    <h3><br>inventory</h3>
+    <p id="gold"></p>
+    <p id="manapotionamount"></p>
+    <button onclick= "buymana()">Buy for 10 gold</button>
+    <p id="healthpotionamount"></p>
+    <button onclick= "buyhealth()">Buy for 20 gold</button>
+    
+    <h3><br>blacksmith</h3>
+    <button onclick="upgradesword()">Upgrade sword for 10 gold</button>
+    <p id="damage"></p>
+    <button onclick="upgradearmor()">Upgrade armor for 10 gold</button>
+    <p id="armor"></p>
+  </body>
+
+
+  
+    <script>
+      var gold = 10;
+      var health = 100;
+      var mana = 100;
+      var manapotions = 5;
+      var healthpotions = 5;
+      var maxhealth = 100;
+      var maxmana = 100;
+      var xp = 0
+      var level = 1
+      var sworddamage = 5
+      var armor = 1
+      var xptolevelup = 100
+      
+      var enemyhealth = 10
+      var enemystunned = 0
+      
+      document.getElementById("gold").innerHTML =
+        "gold: " + gold;
+      document.getElementById("health").innerHTML =
+        "health: " + health + "/" + maxhealth;
+      document.getElementById("mana").innerHTML = 
+        "mana: " + mana + "/" + maxmana;
+      document.getElementById("healthpotionamount").innerHTML = 
+       "health potions: " + healthpotions;
+      document.getElementById("manapotionamount").innerHTML = 
+       "mana potions: " + manapotions;
+      document.getElementById("xp").innerHTML = 
+      "xp: " + xp + "/" + xptolevelup;
+      document.getElementById("level").innerHTML = 
+      "level: " + level;
+      document.getElementById("event").innerHTML = 
+       "You see an orc."
+      document.getElementById("enemyhealth").innerHTML =
+        "The orc has " + enemyhealth + " health."
+      document.getElementById("damage").innerHTML =
+        "sword damage: " + sworddamage
+      document.getElementById("armor").innerHTML =
+        "armor: " + armor;
+      
+      
+
+      
+      function addgold() {
+        gold = gold + Math.floor(Math.random() * 10);
+        document.getElementById("gold").innerHTML =
+          "gold: " + gold;
+      }
+      
+      function addxp(){
+        xp = xp + Math.floor(Math.random()*10)
+        document.getElementById("xp").innerHTML = 
+          "xp: " + xp + "/" + xptolevelup
+        if (xp>xptolevelup-1){
+          level = level + 1
+          document.getElementById("level").innerHTML = 
+            "level: " + level;
+          xp = xp - xptolevelup
+          xptolevelup = 100 * level
+        }
+      }
+
+      function addhealth() {
+        if (healthpotions>0 & health<100){
+        health = health + 20;
+        healthpotions = healthpotions - 1
+        document.getElementById("health").innerHTML =
+          "health: " + health + "/" + maxhealth;
+        document.getElementById("healthpotionamount").innerHTML = 
+          "health potions: " + healthpotions;
+        }
+      }
+                   
+      function addmana(){
+        if (manapotions>0 & mana<100){
+        mana = mana + 20
+        manapotions = manapotions - 1
+        document.getElementById("mana").innerHTML = 
+          "mana: " + mana + "/" + maxmana;
+        document.getElementById("manapotionamount").innerHTML = 
+          "mana potions: " + manapotions;
+        }
+        
+
+        
+      }
+      
+      function attack() {
+        enemyhealth = enemyhealth - sworddamage;
+        document.getElementById("enemyhealth").innerHTML =
+          "The orc has " + enemyhealth + " health."
+        document.getElementById("event").innerHTML =
+          "You swing your sword."
+        setTimeout("enemyattack()", 1000)
+        if (enemyhealth < 1){
+          addgold()
+          addxp()
+          enemyhealth = Math.floor(Math.random()*30) * level
+          enemystunned = 0
+          document.getElementById("event").innerHTML = 
+            "The orc has been slain."
+        }
+
+      }
+      
+      function fireball() {
+        if (mana>14) {
+        enemyhealth = enemyhealth - 10 * level
+        mana = mana - 15
+        document.getElementById("enemyhealth").innerHTML =
+            "The orc has " + enemyhealth + " health."
+        document.getElementById("mana").innerHTML = 
+          "mana: " + mana + "/" + maxmana;
+        document.getElementById("event").innerHTML =
+          "You cast a fireball."
+        setTimeout("enemyattack()", 2000)
+        if (enemyhealth < 1){
+          addgold()
+          addxp()
+          document.getElementById("event").innerHTML = 
+            "The orc has been slain."
+          enemyhealth = Math.floor(Math.random()*30*level) * level
+          enemystunned = 0
+          }
+        }
+        
+      }
+      
+      function pickpocket() {
+        if (mana>9 & level>2) {
+          enemyhealth = enemyhealth - level
+          document.getElementById("enemyhealth").innerHTML =
+            "The orc has " + enemyhealth + " health."
+          document.getElementById("mana").innerHTML = 
+            "mana: " + mana + "/" + maxmana;
+          document.getElementById("event").innerHTML =
+            "You pickpocket the orc."
+          setTimeout("enemyattack()", 1000)
+          if (enemyhealth < 1){
+            addgold()
+            addxp()
+            document.getElementById("event").innerHTML = 
+              "The orc has been slain."
+            enemyhealth = Math.floor(Math.random()*30*level) * level
+
+          }
+        }
+      }
+      
+      
+      function enemyattack() {
+        if (Math.floor(Math.random()*100)>armor){
+        document.getElementById("event").innerHTML = 
+          "The orc swings at you."
+        health = health - Math.floor(Math.random()*5*level)
+        document.getElementById("health").innerHTML =
+          "health: " + health + "/" + maxhealth;
+          if (health<1){
+            document.getElementById("event").innerHTML =
+              "You have died. Refresh to try again"
+          }
+        }
+        }
+      
+      
+      function buymana() {
+        if (gold>9) {
+        gold = gold - 10
+        manapotions = manapotions + 1
+        document.getElementById("gold").innerHTML = 
+          "gold: " + gold
+        document.getElementById("manapotionamount").innerHTML =
+          "mana potions: " + manapotions
+        }
+      }
+      
+      function buyhealth() {
+        if (gold>19) {
+        gold = gold - 20
+        healthpotions = healthpotions + 1
+        document.getElementById("gold").innerHTML = 
+          "gold: " + gold
+        document.getElementById("healthpotionamount").innerHTML =
+          "health potions: " + healthpotions
+        }
+      }
+      
+      function upgradesword() {
+        if (gold>9) {
+          gold = gold - 10
+          sworddamage + 1
+          document.getElementById("gold").innerHTML =
+            "gold: " + gold;
+          document.getElementById("damage").innerHTML =
+            "sword damage: " + sworddamage;
+        }
+      }
+      
+      function upgradearmor() {
+        if (gold>9) {
+          gold = gold - 10
+          armor = armor + 1
+          document.getElementById("gold").innerHTML =
+            "gold: " + gold;
+          document.getElementById("armor").innerHTML =
+            "armor: " + armor;
+        }
+      }
+      
+      function lifetap() {
+        if (mana>19 & level>4){
+          mana = mana - 20
+          enemyhealth = enemyhealth - (5 * level)
+          health = health + (5 * level)
+          document.getElementById("enemyhealth").innerHTML =
+            "The orc has " + enemyhealth + " health."
+          document.getElementById("mana").innerHTML = 
+            "mana: " + mana + "/" + maxmana;
+          document.getElementById("event").innerHTML =
+            "You leech the orc's health"
+          setTimeout("enemyattack()", 1000)
+          if (enemyhealth < 1){
+            addgold()
+            addxp()
+            document.getElementById("event").innerHTML = 
+              "The orc has been slain."
+            enemyhealth = Math.floor(Math.random()*30*level) * level
+          
+        }
+          
+      }
+      }
+      
+      
+    </script>
+
+
+</html>
